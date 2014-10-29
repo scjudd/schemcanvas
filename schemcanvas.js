@@ -38,6 +38,15 @@ function SchemCanvas(elem) {
   this.elem = elem;
   this.ctx = elem.getContext('2d');
   this.components = [];
+  var rect = this.elem.getBoundingClientRect();
+
+  // Add new LED
+  this.elem.addEventListener('dblclick', function(event) {
+    var mouseX = event.x - rect.left;
+    var mouseY = event.y - rect.top;
+    this.addComponent(Components.LED, mouseX, mouseY);
+    this.refresh();
+  }.bind(this));
 }
 
 SchemCanvas.prototype.addComponent = function(component, x, y) {
@@ -48,7 +57,6 @@ SchemCanvas.prototype.addComponent = function(component, x, y) {
   c.y = y - Math.floor(c.image.height / 2);
 
   this.components.push(c);
-  this.refresh();
 };
 
 SchemCanvas.prototype.refresh = function() {
