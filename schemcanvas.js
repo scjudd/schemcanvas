@@ -35,6 +35,7 @@ var Components = (function() {
 })();
 
 function SchemCanvas(elem) {
+  this.elem = elem;
   this.ctx = elem.getContext('2d');
 }
 
