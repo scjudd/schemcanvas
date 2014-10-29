@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Schematic Canvas Demo</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body>
+    <canvas id="canvas" height="500" width="500"></canvas>
+    <script type="text/javascript" src="schemcanvas.js"></script>
+    <script type="text/javascript">
+      var canvas = new SchemCanvas(document.getElementById('canvas'));
+      canvas.drawComponent(Components.LED, 100, 100);
+      canvas.drawComponent(Components.LED, 100, 200);
+    </script>
+  </body>
+</html>
