@@ -47,6 +47,55 @@ function SchemCanvas(elem) {
     this.addComponent(Components.LED, mouseX, mouseY);
     this.refresh();
   }.bind(this));
+
+  // Canvas clicked
+  this.elem.addEventListener('mousedown', function(event) {
+    event.preventDefault();
+    var mouseX = event.x - rect.left;
+    var mouseY = event.y - rect.top;
+    var currentComponent;
+
+    // A component is being dragged
+    var dragging = function(event) {
+      var mouseX = event.x - rect.left;
+      var mouseY = event.y - rect.top;
+      var c = currentComponent;
+
+      // Center component under cursor
+      c.x = mouseX - Math.floor(c.image.width / 2);
+      c.y = mouseY - Math.floor(c.image.height / 2);
+      this.refresh();
+    }.bind(this);
+
+    // Mouse released following drag
+    var stopDragging = function(event) {
+      this.elem.removeEventListener('mousemove', dragging);
+      document.removeEventListener('mouseup', stopDragging);
+    }.bind(this);
+
+    // Check each component to see if we've clicked any
+    for (var i in this.components) {
+      var c = this.components[i];
+
+      // Existing component clicked?
+      if (mouseX >= c.x && mouseX <= c.x + c.image.width &&
+          mouseY >= c.y && mouseY <= c.y + c.image.height) {
+
+        // Center component under cursor
+        c.x = mouseX - Math.floor(c.image.width / 2);
+        c.y = mouseY - Math.floor(c.image.height / 2);
+        this.refresh();
+
+        // Attach start/stop dragging handlers
+        currentComponent = c;
+        this.elem.addEventListener('mousemove', dragging);
+        document.addEventListener('mouseup', stopDragging);
+
+        // Break out of loop
+        return;
+      }
+    }
+  }.bind(this));
 }
 
 SchemCanvas.prototype.addComponent = function(component, x, y) {
