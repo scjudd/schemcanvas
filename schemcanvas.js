@@ -47,7 +47,7 @@ function SchemCanvas(elem) {
     var mouseX = event.x - rect.left;
     var mouseY = event.y - rect.top;
     this.addComponent(Components.LED, mouseX, mouseY);
-    this.refresh();
+    this.repaint();
   }.bind(this));
 
   // Canvas clicked
@@ -61,7 +61,7 @@ function SchemCanvas(elem) {
     var dragging = function(event) {
       currentComponent.x = event.x - rect.left;
       currentComponent.y = event.y - rect.top;
-      this.refresh();
+      this.repaint();
     }.bind(this);
 
     // Mouse released following drag
@@ -83,7 +83,7 @@ function SchemCanvas(elem) {
         // Center component under cursor
         c.x = mouseX;
         c.y = mouseY;
-        this.refresh();
+        this.repaint();
 
         // Attach start/stop dragging handlers
         currentComponent = c;
@@ -104,7 +104,7 @@ SchemCanvas.prototype.addComponent = function(component, x, y) {
   this.components.push(c);
 };
 
-SchemCanvas.prototype.refresh = function() {
+SchemCanvas.prototype.repaint = function() {
   this.ctx.clearRect(0, 0, this.elem.width, this.elem.height);
   for (var i in this.components) {
     var c = this.components[i];
