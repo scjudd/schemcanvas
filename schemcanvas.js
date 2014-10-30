@@ -1,3 +1,7 @@
+/**
+ * An object containing various electronic Components to be used in a
+ * schematic.
+ */
 var Components = (function() {
   var Component = {
     create: function(imageUrl) {
@@ -36,6 +40,11 @@ var Components = (function() {
   };
 })();
 
+/**
+ * A SchemCanvas is a wrapper around a DOM canvas that handles the adding,
+ * removing, joining, and drawing of Components.
+ * @constructor
+ */
 function SchemCanvas(elem) {
   this.elem = elem;
   this.ctx = elem.getContext('2d');
@@ -86,6 +95,13 @@ function SchemCanvas(elem) {
   }.bind(this));
 }
 
+/**
+ * Search through registered Components for any that are positioned underneath
+ * the given (x,y) coordinate point, and return the first result.
+ * @param {Number} x
+ * @param {Number} y
+ * @returns {Component} The first Component found.
+ */
 SchemCanvas.prototype.searchComponents = function(x, y) {
   for (var i in this.components) {
     var component = this.components[i];
@@ -98,6 +114,12 @@ SchemCanvas.prototype.searchComponents = function(x, y) {
   }
 };
 
+/**
+ * Add a new Component at the given (x,y) coordinate point.
+ * @param {Component} component
+ * @param {Number} x
+ * @param {Number} y
+ */
 SchemCanvas.prototype.addComponent = function(component, x, y) {
   var c = Object.create(component);
   c.x = x;
@@ -105,6 +127,7 @@ SchemCanvas.prototype.addComponent = function(component, x, y) {
   this.components.push(c);
 };
 
+/** Clear and repaint the canvas. */
 SchemCanvas.prototype.repaint = function() {
   this.ctx.clearRect(0, 0, this.elem.width, this.elem.height);
   for (var i in this.components) {
