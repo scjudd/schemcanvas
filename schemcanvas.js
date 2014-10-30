@@ -24,6 +24,8 @@ var Components = (function() {
 
     draw: function(ctx, x, y) {
       this.onceLoaded(function() {
+        x -= Math.floor(this.image.width / 2);
+        y -= Math.floor(this.image.height / 2);
         ctx.drawImage(this.image, x, y);
       }.bind(this));
     }
@@ -57,13 +59,8 @@ function SchemCanvas(elem) {
 
     // A component is being dragged
     var dragging = function(event) {
-      var mouseX = event.x - rect.left;
-      var mouseY = event.y - rect.top;
-      var c = currentComponent;
-
-      // Center component under cursor
-      c.x = mouseX - Math.floor(c.image.width / 2);
-      c.y = mouseY - Math.floor(c.image.height / 2);
+      currentComponent.x = event.x - rect.left;
+      currentComponent.y = event.y - rect.top;
       this.refresh();
     }.bind(this);
 
@@ -76,14 +73,16 @@ function SchemCanvas(elem) {
     // Check each component to see if we've clicked any
     for (var i in this.components) {
       var c = this.components[i];
+      var halfW = Math.floor(c.image.width / 2);
+      var halfH = Math.floor(c.image.height / 2);
 
       // Existing component clicked?
-      if (mouseX >= c.x && mouseX <= c.x + c.image.width &&
-          mouseY >= c.y && mouseY <= c.y + c.image.height) {
+      if (mouseX >= c.x - halfW && mouseX <= c.x + halfW &&
+          mouseY >= c.y - halfH && mouseY <= c.y + halfH) {
 
         // Center component under cursor
-        c.x = mouseX - Math.floor(c.image.width / 2);
-        c.y = mouseY - Math.floor(c.image.height / 2);
+        c.x = mouseX;
+        c.y = mouseY;
         this.refresh();
 
         // Attach start/stop dragging handlers
@@ -100,11 +99,8 @@ function SchemCanvas(elem) {
 
 SchemCanvas.prototype.addComponent = function(component, x, y) {
   var c = Object.create(component);
-
-  // Center component on the provided x, y values
-  c.x = x - Math.floor(c.image.width / 2);
-  c.y = y - Math.floor(c.image.height / 2);
-
+  c.x = x;
+  c.y = y;
   this.components.push(c);
 };
 
