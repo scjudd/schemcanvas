@@ -48,6 +48,7 @@ var Components = (function() {
 function SchemCanvas(elem) {
   this.elem = elem;
   this.ctx = elem.getContext('2d');
+  this.currentComponent = null;
   this.components = [];
   var rect = this.elem.getBoundingClientRect();
 
@@ -64,12 +65,11 @@ function SchemCanvas(elem) {
     event.preventDefault();
     var mouseX = event.x - rect.left;
     var mouseY = event.y - rect.top;
-    var currentComponent;
 
     // A component is being dragged
     var dragging = function(event) {
-      currentComponent.x = event.x - rect.left;
-      currentComponent.y = event.y - rect.top;
+      this.currentComponent.x = event.x - rect.left;
+      this.currentComponent.y = event.y - rect.top;
       this.repaint();
     }.bind(this);
 
@@ -81,16 +81,20 @@ function SchemCanvas(elem) {
 
     // Check each component to see if we've clicked any
     var component = this.searchComponents(mouseX, mouseY);
-    if (component) {
+    if (component !== undefined) {
+      this.currentComponent = component;
+
       // Center component under cursor
       component.x = mouseX;
       component.y = mouseY;
       this.repaint();
 
       // Attach start/stop dragging handlers
-      currentComponent = component;
       this.elem.addEventListener('mousemove', dragging);
       document.addEventListener('mouseup', stopDragging);
+    } else if (this.currentComponent !== null) {
+      this.currentComponent = null;
+      this.repaint();
     }
   }.bind(this));
 }
@@ -125,11 +129,36 @@ SchemCanvas.prototype.addComponent = function(component, x, y) {
   component.x = x;
   component.y = y;
   this.components.push(component);
+  this.currentComponent = component;
 };
 
 /** Clear and repaint the canvas. */
 SchemCanvas.prototype.repaint = function() {
+
+  // Clear the canvas
   this.ctx.clearRect(0, 0, this.elem.width, this.elem.height);
+
+  function roundRect(ctx, x, y, w, h, r) {
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
+  }
+
+  if (this.currentComponent !== null) {
+    var component = this.currentComponent;
+    var x = component.x - Math.floor(component.image.width / 2);
+    var y = component.y - Math.floor(component.image.height / 2);
+    roundRect(this.ctx, x, y, component.image.width, component.image.height, 5);
+    this.ctx.fillStyle = '#CFCFCF';
+    this.ctx.fill();
+  }
+
   for (var i in this.components) {
     var component = this.components[i];
     component.draw(this.ctx, component.x, component.y);
