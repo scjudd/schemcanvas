@@ -121,17 +121,17 @@ SchemCanvas.prototype.searchComponents = function(x, y) {
  * @param {Number} y
  */
 SchemCanvas.prototype.addComponent = function(component, x, y) {
-  var c = Object.create(component);
-  c.x = x;
-  c.y = y;
-  this.components.push(c);
+  component = Object.create(component);
+  component.x = x;
+  component.y = y;
+  this.components.push(component);
 };
 
 /** Clear and repaint the canvas. */
 SchemCanvas.prototype.repaint = function() {
   this.ctx.clearRect(0, 0, this.elem.width, this.elem.height);
   for (var i in this.components) {
-    var c = this.components[i];
-    c.draw(this.ctx, c.x, c.y);
+    var component = this.components[i];
+    component.draw(this.ctx, component.x, component.y);
   }
 };
