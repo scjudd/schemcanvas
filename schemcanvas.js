@@ -71,31 +71,32 @@ function SchemCanvas(elem) {
     }.bind(this);
 
     // Check each component to see if we've clicked any
-    for (var i in this.components) {
-      var c = this.components[i];
-      var halfW = Math.floor(c.image.width / 2);
-      var halfH = Math.floor(c.image.height / 2);
+    var component = this.searchComponents(mouseX, mouseY);
+    if (component) {
+      // Center component under cursor
+      component.x = mouseX;
+      component.y = mouseY;
+      this.repaint();
 
-      // Existing component clicked?
-      if (mouseX >= c.x - halfW && mouseX <= c.x + halfW &&
-          mouseY >= c.y - halfH && mouseY <= c.y + halfH) {
-
-        // Center component under cursor
-        c.x = mouseX;
-        c.y = mouseY;
-        this.repaint();
-
-        // Attach start/stop dragging handlers
-        currentComponent = c;
-        this.elem.addEventListener('mousemove', dragging);
-        document.addEventListener('mouseup', stopDragging);
-
-        // Break out of loop
-        return;
-      }
+      // Attach start/stop dragging handlers
+      currentComponent = component;
+      this.elem.addEventListener('mousemove', dragging);
+      document.addEventListener('mouseup', stopDragging);
     }
   }.bind(this));
 }
+
+SchemCanvas.prototype.searchComponents = function(x, y) {
+  for (var i in this.components) {
+    var component = this.components[i];
+    var halfW = Math.floor(component.image.width / 2);
+    var halfH = Math.floor(component.image.height / 2);
+    if (x >= component.x - halfW && x <= component.x + halfW &&
+        y >= component.y - halfH && y <= component.y + halfH) {
+      return component;
+    }
+  }
+};
 
 SchemCanvas.prototype.addComponent = function(component, x, y) {
   var c = Object.create(component);
