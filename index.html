@@ -10,8 +10,9 @@
     <script type="text/javascript">
       var canvas = new SchemCanvas(document.getElementById('canvas'));
       canvas.on('ready', function() {
-        this.addComponent(Components.LED.create(100, 100));
-        this.addComponent(Components.LED.create(100, 200));
+        var c1 = this.addComponent(Components.LED.create(100, 100));
+        var c2 = this.addComponent(Components.LED.create(100, 200));
+        c1.join(c2);
         this.repaint();
       }.bind(canvas));
     </script>

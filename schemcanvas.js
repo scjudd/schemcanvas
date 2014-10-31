@@ -14,6 +14,7 @@
     var Component = {
       create: function(x, y) {
         var that = Object.create(this);
+        that.joins = [];
         that.x = x;
         that.y = y;
         return that;
@@ -23,7 +24,21 @@
         x -= Math.floor(this.image.width / 2);
         y -= Math.floor(this.image.height / 2);
         ctx.drawImage(this.image, x, y);
-      }
+      },
+
+      join: function(other) {
+        if (this !== other && this.joins.indexOf(other) === -1) {
+          this.joins.push(other);
+          other.joins.push(this);
+        }
+      },
+
+      unjoin: function(other) {
+        if (this !== other && this.joins.indexOf(other) !== -1) {
+          this.joins.splice(this.joins.indexOf(other), 1);
+          other.joins.splice(other.joins.indexOf(this), 1);
+        }
+      },
     };
 
     function next() {
@@ -75,6 +90,11 @@
     this.eventHandlers = {};
     var rect = elem.getBoundingClientRect();
 
+    // Prevent right-click menu from showing on canvas.
+    elem.addEventListener('contextmenu', function(event) {
+      event.preventDefault();
+    });
+
     // Add new LED
     elem.addEventListener('dblclick', function(event) {
       var mouseX = event.x - rect.left;
@@ -105,6 +125,18 @@
       // Check each Component to see if we've clicked any
       var component = this.searchComponents(mouseX, mouseY);
       if (component !== undefined) {
+
+        // Right click: join selected Component with clicked Component
+        if (event.which === 3 && this.selected !== null) {
+          if (this.selected.joins.indexOf(component) === -1) {
+            this.selected.join(component);
+          } else if (this.selected.joins.indexOf(component) !== -1) {
+            this.selected.unjoin(component);
+          }
+          this.repaint();
+          return;
+        }
+
         // Left click: select component
         this.selected = component;
 
@@ -225,10 +257,23 @@
       this.ctx.fill();
     }
 
+    var drawnJoins = [];
+
     // Draw Components
     for (var i in this.components) {
       var component = this.components[i];
       component.draw(this.ctx, component.x, component.y);
+
+      // Draw Component joins
+      for (var j in component.joins) {
+        var to = component.joins[j];
+        if (drawnJoins.indexOf(to) !== -1) continue;
+        this.ctx.beginPath();
+        this.ctx.moveTo(component.x, component.y);
+        this.ctx.lineTo(to.x, to.y);
+        this.ctx.stroke();
+      }
+      drawnJoins.push(component);
     }
   };
 
