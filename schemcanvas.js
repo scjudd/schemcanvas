@@ -70,7 +70,7 @@
   function SchemCanvas(elem) {
     this.elem = elem;
     this.ctx = elem.getContext('2d');
-    this.currentComponent = null;
+    this.selected = null;
     this.components = [];
     this.eventHandlers = {};
     var rect = elem.getBoundingClientRect();
@@ -79,7 +79,7 @@
     elem.addEventListener('dblclick', function(event) {
       var mouseX = event.x - rect.left;
       var mouseY = event.y - rect.top;
-      this.addComponent(Components.LED.create(mouseX, mouseY));
+      this.selected = this.addComponent(Components.LED.create(mouseX, mouseY));
       this.repaint();
     }.bind(this));
 
@@ -91,8 +91,8 @@
 
       // A Component is being dragged
       var dragging = function(event) {
-        this.currentComponent.x = event.x - rect.left;
-        this.currentComponent.y = event.y - rect.top;
+        this.selected.x = event.x - rect.left;
+        this.selected.y = event.y - rect.top;
         this.repaint();
       }.bind(this);
 
@@ -106,7 +106,7 @@
       var component = this.searchComponents(mouseX, mouseY);
       if (component !== undefined) {
         // Left click: select component
-        this.currentComponent = component;
+        this.selected = component;
 
         // Center component under cursor
         component.x = mouseX;
@@ -116,8 +116,8 @@
         // Attach start/stop dragging handlers
         elem.addEventListener('mousemove', dragging);
         document.addEventListener('mouseup', stopDragging);
-      } else if (this.currentComponent !== null) {
-        this.currentComponent = null;
+      } else if (this.selected !== null) {
+        this.selected = null;
         this.repaint();
       }
     }.bind(this));
@@ -191,7 +191,7 @@
    */
   SchemCanvas.prototype.addComponent = function(component) {
     this.components.push(component);
-    this.currentComponent = component;
+    return component;
   };
 
   /**
@@ -215,9 +215,9 @@
       ctx.closePath();
     }
 
-    // Draw a rounded rectangle around the currentComponent
-    if (this.currentComponent !== null) {
-      var component = this.currentComponent;
+    // Draw a rounded rectangle around the selected Component.
+    if (this.selected !== null) {
+      var component = this.selected;
       var x = component.x - Math.floor(component.image.width / 2);
       var y = component.y - Math.floor(component.image.height / 2);
       roundRect(this.ctx, x, y, component.image.width, component.image.height, 5);
