@@ -12,6 +12,13 @@
      * An abstract Component, meant to act as a prototype for a concrete object.
      */
     var Component = {
+      create: function(x, y) {
+        var that = Object.create(this);
+        that.x = x;
+        that.y = y;
+        return that;
+      },
+
       draw: function(ctx, x, y) {
         x -= Math.floor(this.image.width / 2);
         y -= Math.floor(this.image.height / 2);
@@ -72,7 +79,7 @@
     elem.addEventListener('dblclick', function(event) {
       var mouseX = event.x - rect.left;
       var mouseY = event.y - rect.top;
-      this.addComponent(Components.LED, mouseX, mouseY);
+      this.addComponent(Components.LED.create(mouseX, mouseY));
       this.repaint();
     }.bind(this));
 
@@ -180,13 +187,9 @@
    * Add a new Component at the given (x,y) coordinate point.
    * @memberOf SchemCanvas
    * @param {Component} component
-   * @param {Number} x
-   * @param {Number} y
+   * @returns {Component}
    */
-  SchemCanvas.prototype.addComponent = function(component, x, y) {
-    component = Object.create(component);
-    component.x = x;
-    component.y = y;
+  SchemCanvas.prototype.addComponent = function(component) {
     this.components.push(component);
     this.currentComponent = component;
   };
