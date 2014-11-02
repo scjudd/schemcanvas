@@ -16,6 +16,9 @@
       create: function(x, y) {
         var that = Object.create(this);
         that.id = lastId += 1;
+        that.joinColor = 'rgb('+Math.floor(Math.random()*256)+','+
+                                Math.floor(Math.random()*256)+','+
+                                Math.floor(Math.random()*256)+')';
         that.joins = [];
         that.x = x;
         that.y = y;
@@ -267,9 +270,14 @@
       drawn[component.id] = true;
 
       // Draw Component joins
+      this.ctx.strokeStyle = component.joinColor;
       for (var j in component.joins) {
         var to = component.joins[j];
         if (!drawn[to.id]) {
+          var grd = this.ctx.createLinearGradient(component.x, component.y, to.x, to.y);
+          grd.addColorStop(0, component.joinColor);
+          grd.addColorStop(1, to.joinColor);
+          this.ctx.strokeStyle = grd;
           this.ctx.beginPath();
           this.ctx.moveTo(component.x, component.y);
           this.ctx.lineTo(to.x, to.y);
