@@ -7,6 +7,7 @@
   var ComponentFactory = (function(finished) {
     var remaining = 0;
     var queue = [];
+    var lastId = 0;
 
     /**
      * An abstract Component, meant to act as a prototype for a concrete object.
@@ -14,6 +15,7 @@
     var Component = {
       create: function(x, y) {
         var that = Object.create(this);
+        that.id = lastId += 1;
         that.joins = [];
         that.x = x;
         that.y = y;
@@ -257,23 +259,23 @@
       this.ctx.fill();
     }
 
-    var drawnJoins = [];
-
     // Draw Components
+    var drawn = {};
     for (var i in this.components) {
       var component = this.components[i];
       component.draw(this.ctx, component.x, component.y);
+      drawn[component.id] = true;
 
       // Draw Component joins
       for (var j in component.joins) {
         var to = component.joins[j];
-        if (drawnJoins.indexOf(to) !== -1) continue;
-        this.ctx.beginPath();
-        this.ctx.moveTo(component.x, component.y);
-        this.ctx.lineTo(to.x, to.y);
-        this.ctx.stroke();
+        if (!drawn[to.id]) {
+          this.ctx.beginPath();
+          this.ctx.moveTo(component.x, component.y);
+          this.ctx.lineTo(to.x, to.y);
+          this.ctx.stroke();
+        }
       }
-      drawnJoins.push(component);
     }
   };
 
